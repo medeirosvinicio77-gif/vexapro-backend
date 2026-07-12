@@ -1,0 +1,28 @@
+{
+  "project_id": "ss",
+  "dimensions": {
+    "width_meters": 4.0,
+    "depth_meters": 9.0,
+    "area_sqm": 36.0
+  },
+  "walls": [
+    {
+      "side": "front",
+      "length": 4.0
+    },
+    {
+      "side": "right",
+      "length": 9.0
+    },
+    {
+      "side": "back",
+      "length": 4.0
+    },
+    {
+      "side": "left",
+      "length": 9.0
+    }
+  ],
+  "openings": [],
+  "image_path": "outputs/ss/floorplan/floor_plan.png"
+}
