@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="VexaPro", version="0.1.0")
 
-# CORS
+# CORS - Permitir acesso do frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,40 +12,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ============ Importar Rotas (com fallback para módulos pesados) ============
-routers = []
+# ============ Importar TODAS as Rotas ============
 
-# Rotas essenciais (sempre carregam)
 from api.v1.auth import router as auth_router
-routers.append(auth_router)
 from api.v1.users import router as users_router
-routers.append(users_router)
 from api.v1.projects import router as projects_router
-routers.append(projects_router)
 from api.v1.videos import router as videos_router
-routers.append(videos_router)
 from api.v1.measurements import router as measurements_router
-routers.append(measurements_router)
+from api.v1.marketplace import router as marketplace_router
+from api.v1.design import router as design_router
+from api.v1.pipeline_endpoint import router as pipeline_router
 
-# Rotas que dependem de bibliotecas pesadas (open3d, torch, ifcopenshell)
-# Se falharem, o servidor continua funcionando sem elas
-try:
-    from api.v1.marketplace import router as marketplace_router
-    routers.append(marketplace_router)
-    print("✅ Marketplace carregado")
-except Exception as e:
-    print(f"⚠️ Marketplace não carregado: {e}")
+# ============ Registrar Rotas ============
 
-try:
-    from api.v1.design import router as design_router
-    routers.append(design_router)
-    print("✅ Design carregado")
-except Exception as e:
-    print(f"⚠️ Design não carregado: {e}")
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
+app.include_router(projects_router, prefix="/api/v1")
+app.include_router(videos_router, prefix="/api/v1")
+app.include_router(measurements_router, prefix="/api/v1")
+app.include_router(marketplace_router, prefix="/api/v1")
+app.include_router(design_router, prefix="/api/v1")
+app.include_router(pipeline_router, prefix="/api/v1")
 
-# Registrar todas as rotas coletadas
-for router in routers:
-    app.include_router(router, prefix="/api/v1")
+# ============ Rotas Básicas ============
 
 @app.get("/")
 def root():
@@ -53,7 +42,16 @@ def root():
         "message": "VexaPro API",
         "version": "0.1.0",
         "status": "running",
-        "modules_loaded": len(routers)
+        "modules": {
+            "auth": "/api/v1/auth",
+            "users": "/api/v1/users",
+            "projects": "/api/v1/projects",
+            "videos": "/api/v1/videos",
+            "measurements": "/api/v1/measurements",
+            "marketplace": "/api/v1/marketplace",
+            "design": "/api/v1/design",
+            "pipeline": "/api/v1/pipeline"
+        }
     }
 
 @app.get("/health")
